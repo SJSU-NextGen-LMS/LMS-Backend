@@ -26,7 +26,8 @@ const userCourse=new Schema({
     },
     modules:{
         type:Array,
-        schema:[moduleStatus],
+        schema:[moduleStatus],// This array includes all modules of the course and a flag indicating whether the student has completed each module.
+
     }
 });
 
