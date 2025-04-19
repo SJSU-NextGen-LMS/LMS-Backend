@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Course from "../models/courseModel";
+import {Course,Module} from "../models/courseModel";
 import AWS from "aws-sdk";
 import { v4 as uuidv4 } from "uuid";
 //import { getAuth } from "@clerk/express";
@@ -49,7 +49,7 @@ export const createCourse = async (
       return;
     }
 
-    const newCourse = new Course({
+    const newCourse = await Course.create({
       courseId: uuidv4(),
       teacherId,
       teacherName,
@@ -60,10 +60,8 @@ export const createCourse = async (
       price: 0,
       level: "Beginner",
       status: "Draft",
-      lessons: [],
       enrollments: [],
     });
-    await newCourse.save();
 
     res.json({ message: "Course created successfully", data: newCourse });
   } catch (error) {
@@ -104,21 +102,6 @@ export const updateCourse = async (
       }
       updateData.price = price * 100;
     }
-
-    if (updateData.lessons) {
-      const lessonsData =
-        typeof updateData.lessons === "string"
-          ? JSON.parse(updateData.lessons)
-          : updateData.lessons;
-      const mergedLessons=[...(course.lessons||[])];
-
-      lessonsData.forEach((lesson: any) => (mergedLessons.push({//push new lesson
-        ...lesson,
-        lessonId: lesson.lessonId || uuidv4(),
-        })));
-        updateData.lessons=mergedLessons;
-    }
-
     Object.assign(course, updateData);
     await course.save();
 
@@ -127,7 +110,6 @@ export const updateCourse = async (
     res.status(500).json({ message: "Error updating course", error });
   }
 };
-
 export const deleteCourse = async (
     req: Request,
     res: Response

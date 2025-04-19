@@ -9,6 +9,8 @@ import * as dynamoose from "dynamoose";
 
 /*ROUTE IMPORTS */
 import courseRoutes from "./routes/courseRoutes";
+import progressRoutes from "./routes/progressRoutes";
+import moduleRoutes from "./routes/moduleRoutes";
 /*CONFIGURATIONS*/
 dotenv.config();
 
@@ -17,6 +19,7 @@ const isProduction=process.env.NODE_ENV=="production";//convinent for testing
 if(!isProduction){
     dynamoose.aws.ddb.local(); // Use local DynamoDB instance instead of AWS
 }
+
 
 const app = express();
 app.use(express.json());
@@ -34,6 +37,8 @@ app.get("/",(req,res)=>{
 });
 
 app.use("/courses",courseRoutes);//any route in courseRoutes are mounted under /courses
+app.use("/modules",moduleRoutes);
+app.use("/progress", progressRoutes);//any route in progressRoutes are mounted under /progress
 //app.use("/users/clerk",requireAuth(),userClerkRoutes);
 
 /* SERVER */

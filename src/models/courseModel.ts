@@ -1,5 +1,10 @@
-import { Schema, model } from "dynamoose";
-
+import dynamoose,{ Schema, model} from "dynamoose";
+const userSchema=new Schema({
+  userId: {
+    type: String,
+    required: true,
+  },
+});
 const commentSchema = new Schema({
   commentId: {
     type: String,
@@ -18,15 +23,23 @@ const commentSchema = new Schema({
     required: true,
   },
 });
-
-const lessonSchema = new Schema({
-  lessonId: {
+const moduleSchema = new Schema({
+  moduleId: {
+    type: String,
+    hashKey: true,
+    required: true,
+  },
+  courseId: {
     type: String,
     required: true,
+    index: {
+      name: "courseIdIndex",
+      type: "global"
+    }//can query on courseId
   },
   type: {
     type: String,
-    enum: ["Text", "Quiz","Video"],
+    enum: ["Text","Video"],
     required: true,
   },
   title: {
@@ -41,8 +54,12 @@ const lessonSchema = new Schema({
     type: Array,
     schema: [commentSchema],
   },
-  video: {
+  moduleVideo: {
     type: String,
+  },
+  order: {
+    type: Number,
+    required: true
   },
 });
 
@@ -88,20 +105,9 @@ const courseSchema = new Schema(
       required: true,
       enum: ["Draft", "Published"],
     },
-    lessons: {
-      type: Array,
-      schema: [lessonSchema],
-    },
     enrollments: {
       type: Array,
-      schema: [
-        new Schema({
-          userId: {
-            type: String,
-            required: true,
-          },
-        }),
-      ],
+      schema: [userSchema],
     },
   },
   {
@@ -110,4 +116,8 @@ const courseSchema = new Schema(
 );
 
 const Course = model("Course", courseSchema);
-export default Course;
+const Module = dynamoose.model("Module", moduleSchema, {
+  create: true,  // automatically create a table when running the project
+  update: true   // automatically update the schema to match the schema definition
+});
+export  {Course,Module};
