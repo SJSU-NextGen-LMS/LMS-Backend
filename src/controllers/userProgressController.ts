@@ -1,41 +1,33 @@
 import { Request, Response } from "express";
 import Progress from "../models/userProgressModel";
-import {Module} from "../models/courseModel";
+import {Module,Course} from "../models/courseModel";
 
-/*
-export const getProgress = async (
+
+export const getUserProgress = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { userId, courseId } = req.params;  // retrieve data from front end
+  const { userId } = req.params;  // retrieve data from front end
   
   // make sure data is existed
-  if (!userId || !courseId) {
-    res.status(400).json({ message: "userId and courseId are required" });
+  if (!userId) {
+    res.status(400).json({ message: "userId are required" });
     return;
   }
 
   try {
     // find the data that match courseId and userId
-    const progress = await Progress.query("courseId")
-      .eq(courseId)
-      .where("userId")
+    const progresses = await Progress.query("userId")
       .eq(userId)
       .exec();
 
     // if not found, send message: "not enrolled"
-    if (progress.length === 0) {
-      res.status(404).json({ message: "User is not enrolled in this course" });
-      return;
-    }
-
-    // find data
-    res.json({ message: "Progress retrieved successfully", data: progress });
+    res.status(200).json(progresses.length > 0 ? progresses : []);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving progress", error });
   }
 };
-*/
+
 export const enrollUserToCourse = async (req: Request, res: Response): Promise<void> => {
     const { userId, courseId } = req.params;
 
@@ -58,6 +50,8 @@ export const enrollUserToCourse = async (req: Request, res: Response): Promise<v
         // 2. 获取课程下所有模块
         const modules = await Module.query("courseId").using("courseIdIndex").eq(courseId).exec();
 
+        const courses = await Course.query("courseId").eq(courseId).exec();
+        const courseTitle=courses[0].title;
         // const modules = [];
 
         // modules.push({
@@ -85,10 +79,11 @@ export const enrollUserToCourse = async (req: Request, res: Response): Promise<v
         const newProgress = await Progress.create({
             userId,
             courseId,
+            courseTitle,
             progressPercentage: 0,
             modules: userModules,
         });
-  
+
       res.status(201).json({ message: "User enrolled successfully", data: newProgress });
     } catch (error) {
       res.status(500).json({ message: "Error enrolling user", error });
@@ -115,7 +110,7 @@ export const updateProgress = async (req: Request, res: Response): Promise<void>
         return;
     }
 
-        // ✅ 更新状态
+        // 更新状态
         existingModule.completed = true;
 
   
@@ -156,8 +151,11 @@ export const updateProgress = async (req: Request, res: Response): Promise<void>
       const merged = modules.map(mod => ({
         moduleId: mod.moduleId,
         title: mod.title,
+        content:mod.content,
         type: mod.type,
-        completed: completedMap.get(mod.moduleId) || false
+        completed: completedMap.get(mod.moduleId) || false,
+        moduleVideo:mod.moduleVideo,
+        order:mod.order
       }));
   
       // get the modules that is newly added
@@ -178,11 +176,10 @@ export const updateProgress = async (req: Request, res: Response): Promise<void>
   
         await progress.save();
       }
-
-      res.json({ message: "Merged progress modules retrieved", data: merged });
+      const sortedMerged = merged.sort((a, b) => a.order - b.order);
+      res.json(sortedMerged);
     } catch (error) {
-      res.status(500).json({ message: "Error merging progress", error });
+      console.error('Error merging progress:', error);
+      res.status(500).json([]);
     }
   };
-  
-

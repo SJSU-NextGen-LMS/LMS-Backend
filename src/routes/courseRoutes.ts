@@ -20,7 +20,7 @@ router.delete("/:courseId",deleteCourse);
 
 
 router.get("/:courseId/modules",getCourseModules);
-router.patch("/:courseId/modules",reorderAndAddModules);
+//router.patch("/:courseId/modules",reorderAndAddModules);
 
 // router.post(
 //     "/:courseId/lessons/:lessonId/get-upload-url",

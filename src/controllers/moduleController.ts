@@ -13,7 +13,7 @@ export const getCourseModules = async (req: Request, res: Response): Promise<voi
     }
 };
 
-//every time we add/remove or edit existed modules we need to reorder
+//every time we add or edit existed modules we need to reorder
 export const reorderAndAddModules = async (req: Request, res: Response): Promise<void> => {
     const { courseId } = req.params;
     const modulesData = req.body;

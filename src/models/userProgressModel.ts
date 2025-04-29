@@ -20,6 +20,10 @@ const userCourse=new Schema({
         required: true,
         rangeKey: true//composite key
     },
+    courseTitle:{
+        type: String,
+        required: true,
+    },
     progressPercentage:{
         type:Number,
         required:true,

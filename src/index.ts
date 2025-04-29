@@ -42,7 +42,7 @@ app.use("/progress", progressRoutes);//any route in progressRoutes are mounted u
 //app.use("/users/clerk",requireAuth(),userClerkRoutes);
 
 /* SERVER */
-const port=process.env.PORT || 3000;
+const port=process.env.PORT || 3001;
 if(!isProduction){
     app.listen(port,()=>{
         console.log(`Server running on port ${port}`);
