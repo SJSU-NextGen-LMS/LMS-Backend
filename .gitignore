@@ -42,6 +42,9 @@ build/Release
 node_modules/
 jspm_packages/
 
+# Local DynamoDB Should be ignored and docker-compose should be used instead
+local_dynamoDb/
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
@@ -130,3 +133,4 @@ data/
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
