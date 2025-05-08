@@ -29,8 +29,9 @@ export const getUserProgress = async (
 };
 
 export const enrollUserToCourse = async (req: Request, res: Response): Promise<void> => {
-    const { userId, courseId } = req.params;
-
+  const { userId, courseId } = req.params as { userId: string; courseId: string };
+    console.log('userId:', userId);
+    console.log('courseId:', courseId);
     if (!userId || !courseId) {
       res.status(400).json({ message: "userId and courseId are required" });
       return;
@@ -51,7 +52,9 @@ export const enrollUserToCourse = async (req: Request, res: Response): Promise<v
         const modules = await Module.query("courseId").using("courseIdIndex").eq(courseId).exec();
 
         const courses = await Course.query("courseId").eq(courseId).exec();
+        console.log('Modules:', modules);
         const courseTitle=courses[0].title;
+        console.log('Courses:', courses);
         // const modules = [];
 
         // modules.push({
@@ -63,11 +66,10 @@ export const enrollUserToCourse = async (req: Request, res: Response): Promise<v
         // });
 
 
-    
-        if (modules.length === 0) {
-            res.status(404).json({ message: "No modules found for this course." });
-            return;
-        }
+        // if (modules.length === 0) {
+        //     res.status(404).json({ message: "No modules found for this course." });
+        //     return;
+        // }
     
         // 3. 构建初始化模块进度
         const userModules = modules.map(mod => ({
@@ -84,7 +86,7 @@ export const enrollUserToCourse = async (req: Request, res: Response): Promise<v
             modules: userModules,
         });
 
-      res.status(201).json({ message: "User enrolled successfully", data: newProgress });
+      res.status(201).json({data: newProgress} );
     } catch (error) {
       res.status(500).json({ message: "Error enrolling user", error });
     }
